@@ -1,71 +1,55 @@
-import { Notify } from 'notiflix/build/notiflix-notify-aio';
+// import { Notify } from 'notiflix/build/notiflix-notify-aio';
 
-import SimpleLightbox from 'simplelightbox';
-import 'simplelightbox/dist/simple-lightbox.min.css';
+// import SimpleLightbox from 'simplelightbox';
+// import 'simplelightbox/dist/simple-lightbox.min.css';
 
-import { renderImages } from '/src/render';
-import { fetchImages } from '/src/fetchImages';
-import './css/styles.css';
+// import { renderImages } from '/src/render';
+// import { fetchImages } from '/src/fetchImages';
+// import './css/styles.css';
+// import axios from 'axios';
 
-const search = document.querySelector('#search-form');
-const gallery = document.querySelector('.gallery');
-const loadMore = document.querySelector('.btn-load-more');
-const messageEmpty = 'You need to write a request';
-const messageError =
-  'Sorry, there are no images matching your search query. Please try again.';
-const messageFull =
-  "We're sorry, but you've reached the end of search results.";
-const firstMessage = 'Hooray! We found totalHits images.';
+const refs = {
+  searchForm: document.querySelector('#search-form'),
+  gallery: document.querySelector('.gallery'),
+  loadMore: document.querySelector('.load-more'),
+};
+console.log(refs.searchForm);
 
-let query = '';
-let page = 1;
-const perPage = 40;
-search.addEventListener('sumbit', handleSearchImages);
-loadMore.addEventListener('click', handleLoadMore);
+refs.searchForm.addEventListener('sumbit', handleSearchForm);
+refs.loadMore.addEventListener('click', handleLoadMore);
 
-function handleSearchImages(event) {
+function handleSearchForm(event) {
   event.preventDefault();
 
-  page = 1;
-  query = event.currentTargert.searchQuery.value.trim();
-  gallery.innerHTML = '';
-  loadMore.classList.add('is hidden');
+  const options = {
+    headers: {
+      'X-Api-Key': '2087ad7622f241ad8284941576a45d1b',
+    },
+  };
 
-  if (query === '') {
-    Notify.info(messageEmpty);
-    return;
-  }
-  fetchImages(query, page, perPage)
-    .then(({ data }) => {
-      if (data.totalHits === 0) {
-        Notify.failure(messageError);
-      } else {
-        renderImages(data.this);
-        SimpleLightbox = new SimpleLightbox('.gallery a').refresh();
-        Notify.success(firstMessage);
-
-        if (data.totalHits > perPage) {
-          loadMore.classList.remove('is-hidden');
-        }
-      }
-    })
-    .catch(error => console.log(error));
+  const url = 'https://newsapi.org/v2/everything?q=tesla&pageSize=5&page=1';
+  fetch(url, options)
+    .then(r => r.json())
+    .catch(console.log());
 }
 
-function handleLoadMore() {
-  page += 1;
-  // SimpleLightbox.destroy()
+function handleLoadMore() {}
 
-  fetchImages(query, page, perPage)
-    .then(({ data }) => {
-      renderImages(data.hits);
+// =========================================
+// Прокручування сторінки!!!!!!!!!!!!!!!!!!
+// Зробити плавне прокручування сторінки після запиту і відтворення кожної наступної групи зображень.
+// Ось тобі код - підказка, але розберися у ньому самостійно.
 
-      const totalPages = Math.ceil(data.totalHits / perPage);
-      SimpleLightbox = new SimpleLightbox('.gallery a').refresh();
-      if (page === totalPages) {
-        loadMore.classList.add('is-hidden');
-        Notify.warning(messageFull);
-      }
-    })
-    .catch(error => console.log(error));
-}
+// Вставляти його треба туди, де у тебе малюється інтерфейс, чи скоріше там, де приходить відповідь на проміс і рендериться розмітка.
+// Можеш в тупу поставити після сповіщення ноьіфікс про те, що знайдено 500 результатів.
+// В чому там прикол, плавний скрол - це переніс вью порта вниз на висоту одного елемента зі швидкістю, шо вказано в формулі(2 в цьому випадку)
+
+// const { height: cardHeight } = document
+//   .querySelector('.gallery')
+//   .firstElementChild.getBoundingClientRect();
+
+// window.scrollBy({
+//   top: cardHeight * 2,
+//   behavior: 'smooth',
+// });
+// Або ще можна 'https://www.npmjs.com/package/only-scrollbar'
