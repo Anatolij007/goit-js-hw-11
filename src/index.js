@@ -5,35 +5,62 @@
 
 // import { renderImages } from '/src/render';
 // import { fetchImages } from '/src/fetchImages';
-// import './css/styles.css';
+import './css/styles.css';
 // import axios from 'axios';
+import articlesTpl from './articles.hbs';
+import NewsApiService from './news-service';
+import LoadMoreBtn from './load-more-btn';
 
 const refs = {
-  searchForm: document.querySelector('#search-form'),
+  search: document.querySelector('#search-form'),
   gallery: document.querySelector('.gallery'),
-  loadMore: document.querySelector('.load-more'),
+  // loadMore: document.querySelector('.load-more'),
 };
-console.log(refs.searchForm);
 
-refs.searchForm.addEventListener('sumbit', handleSearchForm);
-refs.loadMore.addEventListener('click', handleLoadMore);
+const loadMoreBtn = new LoadMoreBtn({
+  selector: '.load-more',
+  hidden: true,
+});
+const newsApiService = new NewsApiService();
 
-function handleSearchForm(event) {
+refs.search.addEventListener('submit', handleSearch);
+// refs.loadMore.addEventListener('click', handleLoadMore);
+loadMoreBtn.refs.button.addEventListener('click', fetchArticlesGroup);
+
+function handleSearch(event) {
   event.preventDefault();
 
-  const options = {
-    headers: {
-      'X-Api-Key': '2087ad7622f241ad8284941576a45d1b',
-    },
-  };
+  newsApiService.searchQuery = event.currentTarget.elements.searchQuery.value;
 
-  const url = 'https://newsapi.org/v2/everything?q=tesla&pageSize=5&page=1';
-  fetch(url, options)
-    .then(r => r.json())
-    .catch(console.log());
+  if (newsApiService.query === '') {
+    return alert('треба щось ввести');
+  }
+  newsApiService.resetPage();
+  loadMoreBtn.show();
+  clearArticlesMarkup();
+
+  fetchArticlesGroup();
 }
 
-function handleLoadMore() {}
+// function handleLoadMore() {
+//   fetchArticlesGroup();
+// }
+
+function fetchArticlesGroup() {
+  loadMoreBtn.disable();
+  newsApiService.fetchArticles().then(articles => {
+    appendArticlesMarkup(articles);
+    loadMoreBtn.enable();
+  });
+}
+
+function appendArticlesMarkup(articles) {
+  refs.gallery.insertAdjacentHTML('beforeend', articlesTpl(articles));
+}
+
+function clearArticlesMarkup() {
+  refs.gallery.innerHTML = '';
+}
 
 // =========================================
 // Прокручування сторінки!!!!!!!!!!!!!!!!!!

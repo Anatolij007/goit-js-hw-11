@@ -40,6 +40,27 @@ input {
   background-color: rgb(70, 70, 165);
 }
 
+.load-more.is-hidden {
+  display: none;
+}
+
 .load-more:hover {
   background-color: rgb(112, 112, 226);
+}
+
+.gallery {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+li {
+  list-style: none;
+}
+
+.gallery-item {
+  margin-right: 20px;
+}
+
+.gallery-item:last-child {
+  margin-right: 0;
 }
