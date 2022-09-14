@@ -1,12 +1,13 @@
 {{#each this}}
   <li class='gallery-item'>
-    <a href='{{url}}' target='_blank' rel='noopener noregerre'>
-      <article>
+    <a href='{{largeImageURL}}' target='_blank' rel='noopener noregerre'>
+      {{!-- <article>
         <img src='{{urlToImage}}' alt='' width='380px' />
-        {{!-- <h2>{{title}}</h2>
+        <h2>{{title}}</h2>
         <p>Posted by: {{author}}</p>
-        <p>{{description}}</p> --}}
-      </article>
+        <p>{{description}}</p>
+      </article> --}}
     </a>
   </li>
+
 {{/each}}

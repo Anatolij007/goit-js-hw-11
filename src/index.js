@@ -3,17 +3,16 @@
 // import SimpleLightbox from 'simplelightbox';
 // import 'simplelightbox/dist/simple-lightbox.min.css';
 
-// import { renderImages } from '/src/render';
-// import { fetchImages } from '/src/fetchImages';
+import renderList from '/src/render';
 import './css/styles.css';
-// import axios from 'axios';
-import articlesTpl from './articles.hbs';
-import NewsApiService from './news-service';
+// import articlesTpl from './articles.hbs';
+import ImagesApiService from './images-service';
 import LoadMoreBtn from './load-more-btn';
 
 const refs = {
   search: document.querySelector('#search-form'),
   gallery: document.querySelector('.gallery'),
+  // body: document.querySelector('body'),
   // loadMore: document.querySelector('.load-more'),
 };
 
@@ -21,21 +20,68 @@ const loadMoreBtn = new LoadMoreBtn({
   selector: '.load-more',
   hidden: true,
 });
-const newsApiService = new NewsApiService();
+const imagesApiService = new ImagesApiService();
 
 refs.search.addEventListener('submit', handleSearch);
 // refs.loadMore.addEventListener('click', handleLoadMore);
 loadMoreBtn.refs.button.addEventListener('click', fetchArticlesGroup);
+// refs.gallery.addEventListener('scroll', handleScroll);
+
+// function handleScroll(e) {
+//   if (e.target.scrollTop + e.target.clientHeight >= e.target.scrollHeight) {
+//     loadMoreBtn.show();
+//     fetchArticlesGroup();
+//   }
+//   console.log(e.target);
+// }
+
+function renderList(items) {
+  const markup = items
+    .map(
+      ({
+        largeImageURL,
+        webformatURL,
+        tags,
+        likes,
+        views,
+        comments,
+        downloads,
+      }) => {
+        return `<div class="photo-card">
+  <a href="${largeImageURL}">
+    <img src="${webformatURL}" alt="${tags}" loading="lazy" />
+    <div class="info">
+      <p class="info-item">
+        <b>Likes</b>${likes}
+      </p>
+      <p class="info-item">
+        <b>Views</b>${views}
+      </p>
+      <p class="info-item">
+        <b>Comments</b>${comments}
+      </p>
+      <p class="info-item">
+        <b>Downloads</b>${downloads}
+      </p>
+    </div>
+  </a>
+</div>`;
+      }
+    )
+    .join('');
+
+  refs.gallery.insertAdjacentHTML('beforeend', markup);
+}
 
 function handleSearch(event) {
   event.preventDefault();
 
-  newsApiService.searchQuery = event.currentTarget.elements.searchQuery.value;
+  imagesApiService.searchQuery = event.currentTarget.elements.searchQuery.value;
 
-  if (newsApiService.query === '') {
+  if (imagesApiService.query === '') {
     return alert('треба щось ввести');
   }
-  newsApiService.resetPage();
+  imagesApiService.resetPage();
   loadMoreBtn.show();
   clearArticlesMarkup();
 
@@ -48,20 +94,19 @@ function handleSearch(event) {
 
 function fetchArticlesGroup() {
   loadMoreBtn.disable();
-  newsApiService.fetchArticles().then(articles => {
-    appendArticlesMarkup(articles);
+  imagesApiService.fetchArticles().then(articles => {
+    renderList(articles);
     loadMoreBtn.enable();
   });
 }
 
-function appendArticlesMarkup(articles) {
-  refs.gallery.insertAdjacentHTML('beforeend', articlesTpl(articles));
-}
+// function appendArticlesMarkup(items) {
+//   refs.gallery.insertAdjacentHTML('beforeend', renderList(items));
+// }
 
 function clearArticlesMarkup() {
   refs.gallery.innerHTML = '';
 }
-
 // =========================================
 // Прокручування сторінки!!!!!!!!!!!!!!!!!!
 // Зробити плавне прокручування сторінки після запиту і відтворення кожної наступної групи зображень.
