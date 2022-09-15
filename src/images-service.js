@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-const API_KEY = '29672911-5d08d722b508a19172ab6b083';
-axios.defaults.baseURL = 'https://pixabay.com/api/';
+// const API_KEY = '29672911-5d08d722b508a19172ab6b083';
+// axios.defaults.baseURL = 'https://pixabay.com/api/';
 
 export default class ImagesApiService {
   constructor() {
@@ -12,9 +12,11 @@ export default class ImagesApiService {
 
   async fetchArticles() {
     try {
+      const url = 'https://pixabay.com/api/';
+
       const options = {
         params: {
-          key: `${API_KEY}`,
+          key: '29672911-5d08d722b508a19172ab6b083',
           q: `${this.searchQuery}`,
           image_type: 'photo',
           orientation: 'horizontal',
@@ -23,10 +25,11 @@ export default class ImagesApiService {
           par_page: 40,
         },
       };
-      const responce = await axios.get(baseURL, options);
+      const responce = await axios.get(url, options);
 
       this.totalHits = responce.data.totalHits;
 
+      // this.page += 1;
       this.incrementPage();
 
       return responce.data;
@@ -41,10 +44,10 @@ export default class ImagesApiService {
     this.page = 1;
   }
 
-  // get query() {
-  //   return this.searchQuery;
-  // }
-  // set query(newQuery) {
-  //   this.searchQuery = newQuery;
-  // }
+  get query() {
+    return this.searchQuery;
+  }
+  set query(newQuery) {
+    this.searchQuery = newQuery;
+  }
 }

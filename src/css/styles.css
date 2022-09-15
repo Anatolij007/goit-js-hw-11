@@ -78,3 +78,11 @@ li {
 .gallery-item:last-child {
   margin-right: 0;
 }
+
+.photo-card {
+  margin: 10px;
+}
+
+.photo-link {
+  display: flex;
+}
