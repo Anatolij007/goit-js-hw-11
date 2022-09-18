@@ -2,6 +2,7 @@
 
 import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
+// import OnlyScroll from 'only-scrollbar';
 
 // import { renderList } from '/src/render';
 import './css/styles.css';
@@ -23,56 +24,28 @@ const loadMoreBtn = new LoadMoreBtn({
 });
 const imagesApiService = new ImagesApiService();
 
+// const scroll = new OnlyScroll(document.querySelector('.scroll-container'));
+
 refs.search.addEventListener('submit', handleSearch);
 // refs.loadMore.addEventListener('click', handleLoadMore);
 loadMoreBtn.refs.button.addEventListener('click', fetchArticlesGroup);
 // refs.gallery.addEventListener('scroll', handleScroll);
 
-// function handleScroll(e) {
-//   if (e.target.scrollTop + e.target.clientHeight >= e.target.scrollHeight) {
-//     loadMoreBtn.show();
-//     fetchArticlesGroup();
-//   }
-//   console.log(e.target);
-// }
+function handleScroll() {
+  const { height: cardHeight } =
+    refs.gallery.firstElementChild.getBoundingClientRect();
 
-// function renderList(data) {
-//   const markup = data
-//     .map(
-//       ({
-//         largeImageURL,
-//         webformatURL,
-//         tags,
-//         likes,
-//         views,
-//         comments,
-//         downloads,
-//       }) => {
-//         return `<div class="photo-card">
-//   <a href="${largeImageURL}">
-//     <img src="${webformatURL}" alt="${tags}" loading="lazy" />
-//     <div class="info">
-//       <p class="info-item">
-//         <b>Likes</b>${likes}
-//       </p>
-//       <p class="info-item">
-//         <b>Views</b>${views}
-//       </p>
-//       <p class="info-item">
-//         <b>Comments</b>${comments}
-//       </p>
-//       <p class="info-item">
-//         <b>Downloads</b>${downloads}
-//       </p>
-//     </div>
-//   </a>
-// </div>`;
-//       }
-//     )
-//     .join('');
-
-//   refs.gallery.insertAdjacentHTML('beforeend', markup);
-// }
+  refs.gallery.scrollBy({
+    top: cardHeight * 2,
+    behavior: 'smooth',
+  });
+  // if (
+  //   refs.gallery.scrollTop + refs.gallery.clientHeight >=
+  //   refs.gallery.scrollHeight
+  // ) {
+  //   fetchArticlesGroup();
+  // }
+}
 
 function renderGallery(data) {
   const markup = renderList(data);
@@ -126,13 +99,18 @@ function handleSearch(event) {
   }
   imagesApiService.resetPage();
   loadMoreBtn.show();
+
   clearArticlesMarkup();
 
   fetchArticlesGroup();
 
+  refs.gallery.addEventListener('scroll', handleScroll);
+
   setTimeout(() => {
     Notify.success(`Hooray! We found ${imagesApiService.totalHits} images.`);
   }, 500);
+
+  // setTimeout(handleScroll, 500);
 }
 
 // function handleLoadMore() {
@@ -150,18 +128,19 @@ function fetchArticlesGroup() {
         Notify.failure(
           'Sorry, there are no images matching your search query. Please try again.'
         );
+
         return;
       }
 
       appendArticlesMarkup(images);
       loadMoreBtn.enable();
+
       return card;
     })
     .then(data => {
       const lightbox = new SimpleLightbox('.gallery a');
       lightbox.refresh();
 
-      console.log(data, imagesApiService.page);
       const total = (imagesApiService.page - 1) * 40;
       if (data.totalHits <= total) {
         Notify.failure(

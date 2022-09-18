@@ -1,7 +1,13 @@
 {{#each this}}
   <div class='photo-card'>
     <a class='photo-link' href='{{largeImageURL}}'>
-      <img src='{{webformatURL}}' alt='${tags}' loading='lazy' width='320' />
+      <img
+        src='{{webformatURL}}'
+        alt='${tags}'
+        loading='lazy'
+        width='320'
+        height='320'
+      />
     </a>
     <div class='info'>
       <p class='info-item'>
